@@ -1,8 +1,8 @@
 import { Auth, AuthProvider, GoogleAuthProvider, OAuthProvider, User, UserCredential, getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { getIdTokenVerificationUrl, getServerSignOutUrl } from "./const";
 import { FirebaseApp } from "firebase/app";
-import { getAppCheck, getAppCheckToken } from "./app-check";
 import { logEvent } from "./analytics";
+import { postRequest } from "./utils";
 
 let _auth: Auth;
 
@@ -13,37 +13,25 @@ const initializeAuth = (app: FirebaseApp) => {
 
 const verifyIdToken = async (user: User) => {
   const idTokenVerificationUrl = getIdTokenVerificationUrl();
-
   if (!idTokenVerificationUrl) {
-    throw new Error("ID Token verification URL is not set.");
+    console.error("ID Token verification URL is not set.");
   }
 
   const idToken = await user.getIdToken();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json"
+  if (!idToken) {
+    console.error("User ID token is not available.");
   }
 
-  if (getAppCheck()) {
-    headers['X-Firebase-AppCheck'] = await getAppCheckToken();
-  }
-
-  // Send the token to your API route
-  const response = await fetch(idTokenVerificationUrl, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ idToken }),
-    credentials: 'include',
-  });
-
+  const response = await postRequest(idTokenVerificationUrl, { idToken })
   if (response.ok) {
-    logEvent('id_token_verified', {
-      uid: user.uid,
-    });
-    return true;
+    console.error('Failed to verify ID token:', response.statusText);
+    return false;
   }
 
-  console.error('Failed to verify ID token:', response.statusText);
-  return false;
+  logEvent('id_token_verified', {
+    uid: user.uid,
+  });
+  return true;
 }
 
 type SignInParams = {
@@ -89,14 +77,7 @@ const signOut = async (redirectUrl: string = "/") => {
   const uid = _auth.currentUser?.uid;
 
   if (serverSignOutUrl) {
-    const response = await fetch(serverSignOutUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        'X-Firebase-AppCheck': await getAppCheckToken()
-      },
-      credentials: 'include',
-    });
+    const response = await postRequest(serverSignOutUrl)
 
     if (response.ok) {
       const data = await response.json();
