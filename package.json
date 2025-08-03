@@ -1,0 +1,27 @@
+{
+  "name": "@authfire/jsfire",
+  "version": "1.0.0",
+  "homepage": "https://github.com/authfire/jsfire#readme",
+  "bugs": {
+    "url": "https://github.com/authfire/jsfire/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/authfire/jsfire.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Vinoth Kannan",
+    "email": "vinoth.kannan@vinkas.com"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "firebase": "^12.0.0",
+    "typescript": "^5.9.2"
+  }
+}
