@@ -1,4 +1,4 @@
-import { Auth, AuthProvider, GoogleAuthProvider, User, UserCredential, getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { Auth, AuthProvider, GoogleAuthProvider, OAuthProvider, User, UserCredential, getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { getIdTokenVerificationUrl, getServerSignOutUrl } from "./const";
 import { FirebaseApp } from "firebase/app";
 import { getAppCheck, getAppCheckToken } from "./app-check";
@@ -63,7 +63,8 @@ const signIn = async ({ email, password, provider }: SignInParams) => {
           authProvider = new GoogleAuthProvider();
           break;
         default:
-          throw new Error(`Unsupported provider: ${provider}`);
+          authProvider = new OAuthProvider(provider);
+          break;
       }
       userCredential = await signInWithPopup(_auth, authProvider);
     } else if (email && password) {
