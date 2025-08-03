@@ -1,6 +1,6 @@
 import { Auth, AuthProvider, User, UserCredential } from "firebase/auth";
 import { FirebaseApp } from "firebase/app";
-declare const setAuth: (app: FirebaseApp) => void;
+declare const setAuth: (app: FirebaseApp) => Auth;
 declare const getAuth: () => Auth;
 declare const verifyIdToken: (user: User) => Promise<boolean>;
 type SignInParams = {
