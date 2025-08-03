@@ -1,6 +1,6 @@
 import { getAppCheck, getAppCheckToken } from "./app-check";
 
-const postRequest = async (url: string, data?: any): Promise<Response> => {
+const postRequest = async (url: string, data: any = {}): Promise<Response> => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json"
   }
