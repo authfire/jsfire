@@ -11,7 +11,7 @@ declare const initialize: (options: FirebaseOptions, idTokenVerificationUrl?: st
     signIn: ({ email, password, provider }: {
         email?: string;
         password?: string;
-        provider?: import("@firebase/auth").AuthProvider;
+        provider?: string;
     }) => Promise<import("@firebase/auth").UserCredential>;
     signOut: (redirectUrl?: string) => Promise<boolean>;
     logEvent: (eventName: string, eventParams?: {
