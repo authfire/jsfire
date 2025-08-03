@@ -4,7 +4,8 @@ import { Firestore, getFirestore as initializeFirestore } from "firebase/firesto
 let _firestore: Firestore
 
 const setFirestore = (app: FirebaseApp) => {
-  _firestore = initializeFirestore(app);
+  _firestore = initializeFirestore(app)
+  return _firestore
 }
 
 const getFirestore = () => {

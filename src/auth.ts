@@ -8,6 +8,7 @@ let _auth: Auth;
 
 const setAuth = (app: FirebaseApp) => {
   _auth = initializeAuth(app);
+  return _auth
 }
 
 const getAuth = () => {

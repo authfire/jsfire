@@ -5,6 +5,7 @@ let _storage: FirebaseStorage
 
 const setStorage = (app: FirebaseApp) => {
   _storage = initializeStorage(app)
+  return _storage
 }
 
 const getStorage = () => {

@@ -15,6 +15,8 @@ export const setAppCheck = (app: FirebaseApp) => {
     provider: new ReCaptchaV3Provider(recaptchaSiteKey),
     isTokenAutoRefreshEnabled: true
   });
+
+  return _appCheck
 };
 
 export const getAppCheck = () => {

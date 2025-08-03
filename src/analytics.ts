@@ -4,7 +4,8 @@ import { FirebaseApp } from "firebase/app";
 let _analytics: Analytics;
 
 export const setAnalytics = (app: FirebaseApp) => {
-  _analytics = initializeAnalytics(app);
+  _analytics = initializeAnalytics(app)
+  return _analytics
 };
 
 export const getAnalytics = () => {
