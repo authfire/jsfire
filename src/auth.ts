@@ -1,8 +1,8 @@
-import { Auth, AuthProvider, GoogleAuthProvider, OAuthProvider, User, UserCredential, getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { Auth, AuthProvider, GoogleAuthProvider, OAuthProvider, User, UserCredential, getAuth, signInWithCustomToken, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { getIdTokenVerificationUrl, getServerSignOutUrl } from "./const";
 import { FirebaseApp } from "firebase/app";
 import { logEvent } from "./analytics";
-import { postRequest } from "./utils";
+import { getServerToken, postRequest } from "./utils";
 
 let _auth: Auth;
 
@@ -58,7 +58,14 @@ const signIn = async ({ email, password, provider }: SignInParams) => {
     } else if (email && password) {
       userCredential = await signInWithEmailAndPassword(_auth, email, password);
     } else {
-      throw new Error("Either provider or email/password must be provided for sign-in.");
+      const serverTokenUrl = getServerSignOutUrl();
+
+      if (!serverTokenUrl) {
+        throw new Error("Either provider or email/password must be provided for sign-in.");
+      }
+
+      const token = await getServerToken(serverTokenUrl);
+      userCredential = await signInWithCustomToken(_auth, token);
     }
   } catch (error) {
     console.error("Error signing in with popup:", error);

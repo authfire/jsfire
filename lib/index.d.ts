@@ -1,5 +1,5 @@
 import { FirebaseOptions } from "firebase/app";
-declare const initialize: (options: FirebaseOptions, idTokenVerificationUrl?: string, serverSignOutUrl?: string, recaptchaSiteKey?: string) => {
+declare const initialize: (options: FirebaseOptions, idTokenVerificationUrl?: string, serverSignOutUrl?: string, serverTokenUrl?: string, recaptchaSiteKey?: string) => {
     app: import("@firebase/app").FirebaseApp;
     appCheck: import("@firebase/app-check").AppCheck | undefined;
     auth: import("@firebase/auth").Auth;

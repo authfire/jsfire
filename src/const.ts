@@ -1,5 +1,6 @@
 let idTokenVerificationUrl: string;
 let serverSignOutUrl: string;
+let serverTokenUrl: string;
 let recaptchaSiteKey: string;
 
 export const setIdTokenVerificationUrl = (url: string) => {
@@ -16,6 +17,14 @@ export const setServerSignOutUrl = (url: string) => {
 
 export const getServerSignOutUrl = () => {
   return serverSignOutUrl;
+};
+
+export const setServerTokenUrl = (url: string) => {
+  serverTokenUrl = url;
+};
+
+export const getServerTokenUrl = () => {
+  return serverTokenUrl;
 };
 
 export const setRecaptchaSiteKey = (key: string) => {

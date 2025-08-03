@@ -5,11 +5,19 @@ import { initializeAuth, signIn, signOut, verifyIdToken } from "./auth"
 import { logEvent, setAnalytics } from "./analytics"
 import { setFirestore } from "./firestore"
 import { setStorage } from "./storage"
-import { setIdTokenVerificationUrl, setRecaptchaSiteKey, setServerSignOutUrl } from "./const"
+import { setIdTokenVerificationUrl, setRecaptchaSiteKey, setServerSignOutUrl, setServerTokenUrl } from "./const"
 
-const initialize = (options: FirebaseOptions, idTokenVerificationUrl?: string, serverSignOutUrl?: string, recaptchaSiteKey?: string) => {
+const initialize = (
+  options: FirebaseOptions,
+  idTokenVerificationUrl?: string,
+  serverSignOutUrl?: string,
+  serverTokenUrl?: string,
+  recaptchaSiteKey?: string
+) => {
+
   if (idTokenVerificationUrl) setIdTokenVerificationUrl(idTokenVerificationUrl)
   if (serverSignOutUrl) setServerSignOutUrl(serverSignOutUrl)
+  if (serverTokenUrl) setServerTokenUrl(serverTokenUrl)
   if (recaptchaSiteKey) setRecaptchaSiteKey(recaptchaSiteKey)
 
   const app = initializeApp(options);
