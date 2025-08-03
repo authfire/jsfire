@@ -7,10 +7,10 @@ import { setFirestore } from "./firestore"
 import { setStorage } from "./storage"
 import { setIdTokenVerificationUrl, setRecaptchaSiteKey, setServerSignOutUrl } from "./const"
 
-const initialize = (options: FirebaseOptions, idTokenVerificationUrl: string, serverSignOutUrl: string, recaptchaSiteKey: string) => {
-  setIdTokenVerificationUrl(idTokenVerificationUrl);
-  setServerSignOutUrl(serverSignOutUrl);
-  setRecaptchaSiteKey(recaptchaSiteKey);
+const initialize = (options: FirebaseOptions, idTokenVerificationUrl?: string, serverSignOutUrl?: string, recaptchaSiteKey?: string) => {
+  if (idTokenVerificationUrl) setIdTokenVerificationUrl(idTokenVerificationUrl)
+  if (serverSignOutUrl) setServerSignOutUrl(serverSignOutUrl)
+  if (recaptchaSiteKey) setRecaptchaSiteKey(recaptchaSiteKey)
 
   const app = initializeApp(options);
   setApp(app);

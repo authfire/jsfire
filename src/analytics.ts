@@ -4,6 +4,10 @@ import { FirebaseApp } from "firebase/app";
 let _analytics: Analytics;
 
 export const setAnalytics = (app: FirebaseApp) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
   _analytics = initializeAnalytics(app)
   return _analytics
 };

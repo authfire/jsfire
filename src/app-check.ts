@@ -7,7 +7,7 @@ let _appCheck: AppCheck;
 export const setAppCheck = (app: FirebaseApp) => {
   const recaptchaSiteKey = getRecaptchaSiteKey();
 
-  if (!recaptchaSiteKey) {
+  if (typeof window === 'undefined' || !recaptchaSiteKey) {
     return;
   }
 
