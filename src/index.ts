@@ -1,7 +1,7 @@
 import { FirebaseOptions, initializeApp } from "firebase/app"
 import { setApp } from "./app"
 import { getAppCheckToken, setAppCheck } from "./app-check"
-import { setAuth, signIn, signOut, verifyIdToken } from "./auth"
+import { initializeAuth, signIn, signOut, verifyIdToken } from "./auth"
 import { logEvent, setAnalytics } from "./analytics"
 import { setFirestore } from "./firestore"
 import { setStorage } from "./storage"
@@ -15,7 +15,7 @@ const initialize = (options: FirebaseOptions, idTokenVerificationUrl?: string, s
   const app = initializeApp(options);
   setApp(app);
   const appCheck = setAppCheck(app)
-  const auth = setAuth(app)
+  const auth = initializeAuth(app)
   const analytics = setAnalytics(app)
   const firestore = setFirestore(app)
   const storage = setStorage(app)

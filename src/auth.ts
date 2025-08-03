@@ -1,4 +1,4 @@
-import { Auth, AuthProvider, User, UserCredential, getAuth as initializeAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { Auth, AuthProvider, User, UserCredential, getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { getIdTokenVerificationUrl, getServerSignOutUrl } from "./const";
 import { FirebaseApp } from "firebase/app";
 import { getAppCheck, getAppCheckToken } from "./app-check";
@@ -6,13 +6,9 @@ import { logEvent } from "./analytics";
 
 let _auth: Auth;
 
-const setAuth = (app: FirebaseApp) => {
-  _auth = initializeAuth(app);
+const initializeAuth = (app: FirebaseApp) => {
+  _auth = getAuth(app);
   return _auth
-}
-
-const getAuth = () => {
-  return _auth;
 }
 
 const verifyIdToken = async (user: User) => {
@@ -57,14 +53,13 @@ type SignInParams = {
 }
 
 const signIn = async ({ email, password, provider }: SignInParams) => {
-  const auth = getAuth();
   let userCredential: UserCredential;
 
   try {
     if (provider) {
-      userCredential = await signInWithPopup(auth, provider);
+      userCredential = await signInWithPopup(_auth, provider);
     } else if (email && password) {
-      userCredential = await signInWithEmailAndPassword(auth, email, password);
+      userCredential = await signInWithEmailAndPassword(_auth, email, password);
     } else {
       throw new Error("Either provider or email/password must be provided for sign-in.");
     }
@@ -81,9 +76,8 @@ const signIn = async ({ email, password, provider }: SignInParams) => {
 }
 
 const signOut = async (redirectUrl: string = "/") => {
-  const auth = getAuth();
   const serverSignOutUrl = getServerSignOutUrl();
-  const uid = auth.currentUser?.uid;
+  const uid = _auth.currentUser?.uid;
 
   if (serverSignOutUrl) {
     const response = await fetch(serverSignOutUrl, {
@@ -106,7 +100,7 @@ const signOut = async (redirectUrl: string = "/") => {
     }
   }
 
-  await auth.signOut();
+  await _auth.signOut();
 
   logEvent('signed_out', {
     uid
@@ -117,8 +111,7 @@ const signOut = async (redirectUrl: string = "/") => {
 };
 
 export {
-  setAuth,
-  getAuth,
+  initializeAuth,
   verifyIdToken,
   signIn,
   signOut
