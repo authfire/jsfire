@@ -23,7 +23,7 @@ const verifyIdToken = async (user: User) => {
   }
 
   const response = await postRequest(idTokenVerificationUrl, { idToken })
-  if (response.ok) {
+  if (!response.ok) {
     console.error('Failed to verify ID token:', response.statusText);
     return false;
   }
