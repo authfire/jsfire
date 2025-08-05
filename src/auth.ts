@@ -3,7 +3,7 @@ import { getServerToken, postRequest } from "./utils";
 import { Analytics } from "firebase/analytics";
 import { logEvent } from "./analytics";
 import { AppCheck } from "firebase/app-check";
-import { idTokenVerificationUrl, serverTokenUrl } from ".";
+import { baseUrl, idTokenVerificationUrl, serverSignOutUrl, serverTokenUrl } from ".";
 
 const verifyIdToken = async (user: User, appCheck?: AppCheck, analytics?: Analytics) => {
   if (!idTokenVerificationUrl) {
@@ -63,8 +63,9 @@ const signIn = async ({ auth, email, password, provider, analytics }: SignInPara
   return userCredential;
 }
 
-const signOut = async (auth: Auth, serverSignOutUrl: string, appCheck?: AppCheck, redirectUrl: string = "/", analytics?: Analytics) => {
+const signOut = async (auth: Auth, appCheck?: AppCheck, analytics?: Analytics) => {
   const uid = auth.currentUser?.uid;
+  let redirectUrl = baseUrl
 
   if (serverSignOutUrl) {
     const response = await postRequest(serverSignOutUrl, appCheck)

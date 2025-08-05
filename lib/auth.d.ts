@@ -10,5 +10,5 @@ type SignInParams = {
     analytics?: Analytics;
 };
 declare const signIn: ({ auth, email, password, provider, analytics }: SignInParams) => Promise<UserCredential>;
-declare const signOut: (auth: Auth, serverSignOutUrl: string, appCheck?: AppCheck, redirectUrl?: string, analytics?: Analytics) => Promise<boolean>;
+declare const signOut: (auth: Auth, appCheck?: AppCheck, analytics?: Analytics) => Promise<boolean>;
 export { verifyIdToken, signIn, signOut };
