@@ -5,7 +5,7 @@ import { logEvent } from "./analytics";
 import { AppCheck } from "firebase/app-check";
 import { baseUrl, idTokenVerificationUrl, serverSignOutUrl, serverTokenUrl } from ".";
 
-const verifyIdToken = async (user: User, appCheck?: AppCheck, analytics?: Analytics) => {
+const verifyIdToken = async (user: User, analytics?: Analytics) => {
   if (!idTokenVerificationUrl) {
     console.error("ID Token verification URL is not set.");
     return false
@@ -17,7 +17,7 @@ const verifyIdToken = async (user: User, appCheck?: AppCheck, analytics?: Analyt
     return false
   }
 
-  const response = await postRequest(idTokenVerificationUrl, appCheck, { idToken })
+  const response = await postRequest(idTokenVerificationUrl, { idToken })
   if (!response.ok) {
     console.error('Failed to verify ID token:', response.statusText)
     return false
@@ -34,11 +34,10 @@ type SignInParams = {
   email?: string;
   password?: string;
   provider?: GoogleAuthProvider | OAuthProvider;
-  appCheck?: AppCheck;
   analytics?: Analytics;
 }
 
-const signIn = async ({ auth, email, password, provider, appCheck, analytics }: SignInParams) => {
+const signIn = async ({ auth, email, password, provider, analytics }: SignInParams) => {
   let userCredential: UserCredential;
 
   try {
@@ -47,7 +46,7 @@ const signIn = async ({ auth, email, password, provider, appCheck, analytics }: 
     } else if (email && password) {
       userCredential = await signInWithEmailAndPassword(auth, email, password);
     } else if (serverTokenUrl) {
-      const token = await getServerToken(serverTokenUrl, appCheck);
+      const token = await getServerToken(serverTokenUrl);
       userCredential = await signInWithCustomToken(auth, token);
     } else {
       throw new Error("No valid sign-in method provided. Please provide either email/password, provider, or server token URL.");
@@ -64,12 +63,12 @@ const signIn = async ({ auth, email, password, provider, appCheck, analytics }: 
   return userCredential;
 }
 
-const signOut = async (auth: Auth, appCheck?: AppCheck, analytics?: Analytics) => {
+const signOut = async (auth: Auth, analytics?: Analytics) => {
   const uid = auth.currentUser?.uid;
   let redirectUrl = baseUrl
 
   if (serverSignOutUrl) {
-    const response = await postRequest(serverSignOutUrl, appCheck)
+    const response = await postRequest(serverSignOutUrl)
 
     if (response.ok) {
       const data = await response.json();

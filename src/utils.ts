@@ -1,13 +1,13 @@
-import { AppCheck, getToken } from "firebase/app-check";
+import { AppCheck } from "firebase/app-check";
+import { generateAppCheckToken } from ".";
 
-const postRequest = async (url: string, appCheck?: AppCheck, data: any = {}): Promise<Response> => {
+const postRequest = async (url: string, data: any = {}): Promise<Response> => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json"
   }
 
-  if (appCheck) {
-    const appCheckToken = await getToken(appCheck, true)
-    headers['X-Firebase-AppCheck'] = appCheckToken.token
+  if (generateAppCheckToken) {
+    headers['X-Firebase-AppCheck'] = await generateAppCheckToken()
   }
 
   return await fetch(url, {
@@ -18,8 +18,8 @@ const postRequest = async (url: string, appCheck?: AppCheck, data: any = {}): Pr
   });
 };
 
-const getServerToken = async (serverTokenUrl: string, appCheck?: AppCheck): Promise<string> => {
-  const response = await postRequest(serverTokenUrl, appCheck);
+const getServerToken = async (serverTokenUrl: string): Promise<string> => {
+  const response = await postRequest(serverTokenUrl);
 
   if (!response.ok) {
     throw new Error("Failed to get server token: " + response.statusText);
