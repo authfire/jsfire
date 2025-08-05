@@ -7,8 +7,9 @@ type SignInParams = {
     email?: string;
     password?: string;
     provider?: GoogleAuthProvider | OAuthProvider;
+    appCheck?: AppCheck;
     analytics?: Analytics;
 };
-declare const signIn: ({ auth, email, password, provider, analytics }: SignInParams) => Promise<UserCredential>;
+declare const signIn: ({ auth, email, password, provider, appCheck, analytics }: SignInParams) => Promise<UserCredential>;
 declare const signOut: (auth: Auth, appCheck?: AppCheck, analytics?: Analytics) => Promise<boolean>;
 export { verifyIdToken, signIn, signOut };

@@ -18,8 +18,8 @@ const postRequest = async (url: string, appCheck?: AppCheck, data: any = {}): Pr
   });
 };
 
-const getServerToken = async (serverTokenUrl: string): Promise<string> => {
-  const response = await postRequest(serverTokenUrl);
+const getServerToken = async (serverTokenUrl: string, appCheck?: AppCheck): Promise<string> => {
+  const response = await postRequest(serverTokenUrl, appCheck);
 
   if (!response.ok) {
     throw new Error("Failed to get server token: " + response.statusText);

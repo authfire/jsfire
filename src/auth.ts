@@ -34,10 +34,11 @@ type SignInParams = {
   email?: string;
   password?: string;
   provider?: GoogleAuthProvider | OAuthProvider;
+  appCheck?: AppCheck;
   analytics?: Analytics;
 }
 
-const signIn = async ({ auth, email, password, provider, analytics }: SignInParams) => {
+const signIn = async ({ auth, email, password, provider, appCheck, analytics }: SignInParams) => {
   let userCredential: UserCredential;
 
   try {
@@ -46,7 +47,7 @@ const signIn = async ({ auth, email, password, provider, analytics }: SignInPara
     } else if (email && password) {
       userCredential = await signInWithEmailAndPassword(auth, email, password);
     } else if (serverTokenUrl) {
-      const token = await getServerToken(serverTokenUrl);
+      const token = await getServerToken(serverTokenUrl, appCheck);
       userCredential = await signInWithCustomToken(auth, token);
     } else {
       throw new Error("No valid sign-in method provided. Please provide either email/password, provider, or server token URL.");
