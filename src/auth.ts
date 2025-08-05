@@ -1,19 +1,10 @@
-import { Auth, AuthProvider, GoogleAuthProvider, OAuthProvider, User, UserCredential, getAuth, signInWithCustomToken, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { getIdTokenVerificationUrl, getServerSignOutUrl, getServerTokenUrl } from "./const";
-import { FirebaseApp } from "firebase/app";
-import { logEvent } from "./analytics";
+import { Auth, GoogleAuthProvider, OAuthProvider, User, UserCredential, signInWithCustomToken, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { getServerToken, postRequest } from "./utils";
+import { Analytics } from "firebase/analytics";
+import { logEvent } from "./analytics";
 
-let _auth: Auth;
-
-const initializeAuth = (app: FirebaseApp) => {
-  _auth = getAuth(app);
-  return _auth
-}
-
-const verifyIdToken = async (user: User) => {
-  const idTokenVerificationUrl = getIdTokenVerificationUrl();
-  if (!idTokenVerificationUrl) {
+const verifyIdToken = async (user: User, url: string, appCheckToken?: string, analytics?: Analytics) => {
+  if (!url) {
     console.error("ID Token verification URL is not set.");
   }
 
@@ -22,74 +13,63 @@ const verifyIdToken = async (user: User) => {
     console.error("User ID token is not available.");
   }
 
-  const response = await postRequest(idTokenVerificationUrl, { idToken })
+  const response = await postRequest(url, appCheckToken, { idToken })
   if (!response.ok) {
     console.error('Failed to verify ID token:', response.statusText);
     return false;
   }
 
-  logEvent('id_token_verified', {
+  logEvent(analytics, 'id_token_verified', {
     uid: user.uid,
   });
   return true;
 }
 
 type SignInParams = {
+  auth: Auth;
   email?: string;
   password?: string;
-  provider?: string;
+  provider?: GoogleAuthProvider | OAuthProvider;
+  serverTokenUrl?: string;
+  analytics?: Analytics;
 }
 
-const signIn = async ({ email, password, provider }: SignInParams) => {
+const signIn = async ({ auth, email, password, provider, serverTokenUrl, analytics }: SignInParams) => {
   let userCredential: UserCredential;
 
   try {
     if (provider) {
-      let authProvider: AuthProvider;
-      switch (provider) {
-        case 'google':
-          authProvider = new GoogleAuthProvider();
-          break;
-        default:
-          authProvider = new OAuthProvider(provider);
-          break;
-      }
-      userCredential = await signInWithPopup(_auth, authProvider);
+      userCredential = await signInWithPopup(auth, provider);
     } else if (email && password) {
-      userCredential = await signInWithEmailAndPassword(_auth, email, password);
-    } else {
-      const serverTokenUrl = getServerTokenUrl();
-
-      if (!serverTokenUrl) {
-        throw new Error("Either provider or email/password must be provided for sign-in.");
-      }
-
+      userCredential = await signInWithEmailAndPassword(auth, email, password);
+    } else if (serverTokenUrl) {
       const token = await getServerToken(serverTokenUrl);
-      userCredential = await signInWithCustomToken(_auth, token);
+      userCredential = await signInWithCustomToken(auth, token);
+    } else {
+      throw new Error("No valid sign-in method provided. Please provide either email/password, provider, or server token URL.");
     }
   } catch (error) {
     console.error("Error signing in with popup:", error);
     throw error; // Re-throw the error for further handling if needed
   }
 
-  logEvent('signed_in', {
+  logEvent(analytics, 'signed_in', {
     uid: userCredential.user.uid,
   });
 
   return userCredential;
 }
 
-const signOut = async (redirectUrl: string = "/") => {
-  const serverSignOutUrl = getServerSignOutUrl();
-  const uid = _auth.currentUser?.uid;
+const signOut = async (auth: Auth, serverSignOutUrl: string, appCheckToken?: string, redirectUrl: string = "/", analytics?: Analytics) => {
+  const uid = auth.currentUser?.uid;
 
   if (serverSignOutUrl) {
-    const response = await postRequest(serverSignOutUrl)
+    const response = await postRequest(serverSignOutUrl, appCheckToken)
 
     if (response.ok) {
       const data = await response.json();
       if (data.status === 'success') {
-        logEvent('server_signed_out', {
+        logEvent(analytics, 'server_signed_out', {
           uid
         });
         redirectUrl = data.redirectUrl || redirectUrl;
@@ -97,9 +77,9 @@ const signOut = async (redirectUrl: string = "/") => {
     }
   }
 
-  await _auth.signOut();
+  await auth.signOut();
 
-  logEvent('signed_out', {
+  logEvent(analytics, 'signed_out', {
     uid
   });
 
@@ -108,7 +88,6 @@ const signOut = async (redirectUrl: string = "/") => {
 };
 
 export {
-  initializeAuth,
   verifyIdToken,
   signIn,
   signOut

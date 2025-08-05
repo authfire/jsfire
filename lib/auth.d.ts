@@ -1,12 +1,14 @@
-import { Auth, User, UserCredential } from "firebase/auth";
-import { FirebaseApp } from "firebase/app";
-declare const initializeAuth: (app: FirebaseApp) => Auth;
-declare const verifyIdToken: (user: User) => Promise<boolean>;
+import { Auth, GoogleAuthProvider, OAuthProvider, User, UserCredential } from "firebase/auth";
+import { Analytics } from "firebase/analytics";
+declare const verifyIdToken: (user: User, url: string, appCheckToken?: string, analytics?: Analytics) => Promise<boolean>;
 type SignInParams = {
+    auth: Auth;
     email?: string;
     password?: string;
-    provider?: string;
+    provider?: GoogleAuthProvider | OAuthProvider;
+    serverTokenUrl?: string;
+    analytics?: Analytics;
 };
-declare const signIn: ({ email, password, provider }: SignInParams) => Promise<UserCredential>;
-declare const signOut: (redirectUrl?: string) => Promise<boolean>;
-export { initializeAuth, verifyIdToken, signIn, signOut };
+declare const signIn: ({ auth, email, password, provider, serverTokenUrl, analytics }: SignInParams) => Promise<UserCredential>;
+declare const signOut: (auth: Auth, serverSignOutUrl: string, appCheckToken?: string, redirectUrl?: string, analytics?: Analytics) => Promise<boolean>;
+export { verifyIdToken, signIn, signOut };

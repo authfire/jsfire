@@ -1,24 +1,7 @@
-import { Analytics, getAnalytics as initializeAnalytics, logEvent as _logEvent } from "firebase/analytics";
-import { FirebaseApp } from "firebase/app";
+import { logEvent as _logEvent, Analytics } from "firebase/analytics";
 
-let _analytics: Analytics;
+export const logEvent = (analytics: Analytics|undefined, eventName: string, eventParams?: Record<string, any>) => {
+  if (!analytics) return;
 
-export const setAnalytics = (app: FirebaseApp) => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  _analytics = initializeAnalytics(app)
-  return _analytics
-};
-
-export const getAnalytics = () => {
-  return _analytics;
-};
-
-export const logEvent = (eventName: string, eventParams?: { [key: string]: any }) => {
-  if (!_analytics) {
-    throw new Error("Analytics is not initialized. Please call setAnalytics() with a FirebaseApp instance.");
-  }
-  _logEvent(_analytics, eventName, eventParams);
+  _logEvent(analytics, eventName, eventParams)
 }
