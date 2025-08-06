@@ -1,11 +1,9 @@
 import { Auth, GoogleAuthProvider, OAuthProvider, User, UserCredential, signInWithCustomToken, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { getServerToken, postRequest } from "./utils";
 import { Analytics } from "firebase/analytics";
-import { logEvent } from "./analytics";
-import { AppCheck } from "firebase/app-check";
-import { baseUrl, idTokenVerificationUrl, serverSignOutUrl, serverTokenUrl } from ".";
+import { baseUrl, idTokenVerificationUrl, logEvent, serverSignOutUrl, serverTokenUrl } from ".";
 
-const verifyIdToken = async (user: User, analytics?: Analytics) => {
+const verifyIdToken = async (user: User) => {
   if (!idTokenVerificationUrl) {
     console.error("ID Token verification URL is not set.");
     return false
@@ -23,9 +21,11 @@ const verifyIdToken = async (user: User, analytics?: Analytics) => {
     return false
   }
 
-  logEvent(analytics, 'id_token_verified', {
-    uid: user.uid,
-  });
+  if (logEvent) {
+    logEvent('id_token_verified', {
+      uid: user.uid,
+    });
+  }
   return true;
 }
 
@@ -37,7 +37,7 @@ type SignInParams = {
   analytics?: Analytics;
 }
 
-const signIn = async ({ auth, email, password, provider, analytics }: SignInParams) => {
+const signIn = async ({ auth, email, password, provider }: SignInParams) => {
   let userCredential: UserCredential;
 
   try {
@@ -56,14 +56,16 @@ const signIn = async ({ auth, email, password, provider, analytics }: SignInPara
     throw error; // Re-throw the error for further handling if needed
   }
 
-  logEvent(analytics, 'signed_in', {
-    uid: userCredential.user.uid,
-  });
+  if (logEvent) {
+    logEvent('signed_in', {
+      uid: userCredential.user.uid,
+    });
+  }
 
   return userCredential;
 }
 
-const signOut = async (auth: Auth, analytics?: Analytics) => {
+const signOut = async (auth: Auth) => {
   const uid = auth.currentUser?.uid;
   let redirectUrl = baseUrl
 
@@ -73,9 +75,11 @@ const signOut = async (auth: Auth, analytics?: Analytics) => {
     if (response.ok) {
       const data = await response.json();
       if (data.status === 'success') {
-        logEvent(analytics, 'server_signed_out', {
-          uid
-        });
+        if (logEvent) {
+          logEvent('server_signed_out', {
+            uid
+          });
+        }
         redirectUrl = data.redirectUrl || redirectUrl;
       }
     }
@@ -83,9 +87,11 @@ const signOut = async (auth: Auth, analytics?: Analytics) => {
 
   await auth.signOut();
 
-  logEvent(analytics, 'signed_out', {
-    uid
-  });
+  if (logEvent) {
+    logEvent('signed_out', {
+      uid
+    });
+  }
 
   window.location.href = redirectUrl;
   return true;

@@ -1,13 +1,12 @@
-import { AppCheck } from "firebase/app-check";
-import { generateAppCheckToken } from ".";
+import { getAppCheckToken } from ".";
 
 const postRequest = async (url: string, data: any = {}): Promise<Response> => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json"
   }
 
-  if (generateAppCheckToken) {
-    headers['X-Firebase-AppCheck'] = await generateAppCheckToken()
+  if (getAppCheckToken) {
+    headers['X-Firebase-AppCheck'] = await getAppCheckToken()
   }
 
   return await fetch(url, {
