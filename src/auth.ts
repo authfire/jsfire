@@ -1,6 +1,15 @@
-import { Auth, GoogleAuthProvider, OAuthProvider, User, UserCredential, signInWithCustomToken, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  Auth,
+  GoogleAuthProvider,
+  OAuthProvider,
+  User,
+  UserCredential,
+  signInWithCustomToken,
+  signInWithEmailAndPassword,
+  signInWithEmailLink,
+  signInWithPopup
+} from "firebase/auth";
 import { getServerToken, postRequest } from "./utils";
-import { Analytics } from "firebase/analytics";
 import { baseUrl, idTokenVerificationUrl, logEvent, serverSignOutUrl, serverTokenUrl } from ".";
 
 const verifyIdToken = async (user: User) => {
@@ -34,10 +43,10 @@ type SignInParams = {
   email?: string;
   password?: string;
   provider?: GoogleAuthProvider | OAuthProvider;
-  analytics?: Analytics;
+  url?: string;
 }
 
-const signIn = async ({ auth, email, password, provider }: SignInParams) => {
+const signIn = async ({ auth, email, password, provider, url }: SignInParams) => {
   let userCredential: UserCredential;
 
   try {
@@ -45,6 +54,8 @@ const signIn = async ({ auth, email, password, provider }: SignInParams) => {
       userCredential = await signInWithPopup(auth, provider);
     } else if (email && password) {
       userCredential = await signInWithEmailAndPassword(auth, email, password);
+    } else if (email && url) {
+      userCredential = await signInWithEmailLink(auth, email, url);
     } else if (serverTokenUrl) {
       const token = await getServerToken(serverTokenUrl);
       userCredential = await signInWithCustomToken(auth, token);
